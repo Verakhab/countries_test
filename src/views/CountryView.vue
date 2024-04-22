@@ -18,7 +18,7 @@ export default {
         return {
             loader: true,
             country: null,
-            countryName: this.$route.params.name,
+            countryName: '',
             loadDataMessage: '',
             historyCountryView: 0
         }
@@ -79,6 +79,7 @@ export default {
     },
     // хук ж.ц.
     async created() {
+        this.countryName = this.$route.params.name;
         await this.getCountryData();
     }
 }

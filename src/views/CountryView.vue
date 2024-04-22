@@ -78,7 +78,7 @@ export default {
         }
     },
     // хук ж.ц.
-    async created() {
+    async created() {debugger
         await this.getCountryData();
     }
 }

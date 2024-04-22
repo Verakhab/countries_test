@@ -9,6 +9,9 @@ import CountriesApi from '@/api/countries';
 // libs
 import { debounce, delay } from 'lodash';
 
+// interfaces
+import Country from '@/interfaces/Country';
+
 export default {
     name: 'HomeView',
     components: { InputComponent, CountriesList },
@@ -22,29 +25,37 @@ export default {
         }
     },
     computed: {
+        // отображение списка когда отключился лоадер и нет ошибки
         isLoadDataMessage() {
             return !this.loader && !this.loadDataMessage ? false : true;
         }
     },
     methods: {
+        // обработчик ввода в инпут поиска
         changeValueInput(newValue) {
             this.searchQuery = newValue;
         },
+        // получение стран(ы) с дебаунсом в 700мс
         async getCountry() {
             this.loader = true;
             try {
-                const countryData = await CountriesApi.getCountry({ name: this.searchQuery });
-                this.countriesListData = countryData.data;
+                const countryData = await CountriesApi.getCountries({ name: this.searchQuery.toLowerCase() });
+                this.countriesListData = countryData.data.map(country => {
+                    return new Country(country);
+                });
                 delay(() => this.loader = false, 300);
             } catch (error) {
                 this.loadDataMessage = 'Произошла ошибка, попробуйте позднее'
                 delay(() => this.loader = false, 300);
             }
         },
+        // получение стран при открытии страницы
         async getCountries() {
             try {
                 const countriesData = await CountriesApi.getCountries();
-                this.countriesListData = countriesData.data;
+                this.countriesListData = countriesData.data.map(country => {
+                    return new Country(country);
+                });;
                 delay(() => this.loader = false, 300);
             } catch (error) {
                 this.loadDataMessage = 'Произошла ошибка, попробуйте позднее'
@@ -53,10 +64,12 @@ export default {
         }
     },
     watch: {
+        // вотч на изменение инпута поиска
         async searchQuery() {
             await this.debounceSearch();
         }
     },
+    // хук ж.ц.
     async created() {
         await this.getCountries();
         this.debounceSearch = debounce(this.getCountry, 700);
@@ -66,8 +79,10 @@ export default {
 
 <template>
     <div class="home">
-        <InputComponent :model-value="searchQuery" @update:model-value="changeValueInput"
-            placeholder="Search for a country…" />
+        <div class="home__search-wrapper">
+            <InputComponent :model-value="searchQuery" @update:model-value="changeValueInput"
+                placeholder="Search for a country…" class="home__search" />
+        </div>
         <CountriesList v-if="!isLoadDataMessage" :cardList="countriesListData" />
         <span v-if="loader" class="home__loader"></span>
         <p v-if="loadDataMessage" class="home__message">{{ loadDataMessage }}</p>
@@ -144,6 +159,30 @@ export default {
 @keyframes animloader {
     50% {
         transform: scale(1) translate(-50%, -50%);
+    }
+}
+
+@media (min-width: 1440px) {
+    .home {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 80px;
+
+        &__search {
+            height: 56px;
+            max-width: 480px;
+            margin-bottom: 48px;
+
+            &-wrapper {
+                width: 1280px;
+            }
+
+            .input__input {
+                font-size: 14px;
+                background: no-repeat 32px 19px / 18px 18px url('../assets/img/search.svg'), transparent;
+            }
+        }
     }
 }
 </style>

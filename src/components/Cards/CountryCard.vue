@@ -7,6 +7,7 @@ export default {
         }
     },
     methods: {
+        // переход на страницу страны
         goToCountry() {
             this.$router.push(this.card.name.toLowerCase().split(' ')[0]);
         }
@@ -105,6 +106,12 @@ export default {
         font-family: 'Nunito Sans';
         font-size: 14px;
         font-weight: 300;
+    }
+}
+
+@media (min-width: 1440px) {
+    .country-card {
+        margin-bottom: 0;
     }
 }
 </style>

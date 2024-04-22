@@ -37,4 +37,15 @@ export default {
     align-items: center;
     flex-direction: column;
 }
+
+@media (min-width: 1440px) {
+    .countries-list {
+        display: grid;
+        grid-template-columns: repeat(4, 264px);
+        grid-template-rows: min-content;
+        grid-gap: 75px;
+        justify-content: center;
+        padding: 0;
+    }
+}
 </style>

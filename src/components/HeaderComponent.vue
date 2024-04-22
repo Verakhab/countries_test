@@ -3,13 +3,19 @@ export default {
     name: 'HeaderComponent',
     data() {
         return {}
+    },
+    methods: {
+        // перейти на главную страницу
+        goToHome() {
+            this.$router.push('/');
+        }
     }
 }
 </script>
 
 <template>
     <header class="header">
-        <div class="header__slogan">Where in the world?</div>
+        <div class="header__slogan" @click="goToHome">Where in the world?</div>
     </header>
 </template>
 
@@ -32,6 +38,18 @@ export default {
         font-weight: 800;
         color: #000000;
         font-size: 14px;
+        cursor: pointer;
+    }
+}
+
+@media (min-width: 1440px) {
+    .header {
+        padding: 23px 81px 24px 81px;
+        margin-bottom: 48px;
+
+        &__slogan {
+            font-size: 24px;
+        }
     }
 }
 </style>

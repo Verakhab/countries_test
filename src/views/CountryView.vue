@@ -8,6 +8,9 @@ import CountriesApi from '@/api/countries';
 // libs
 import { delay } from 'lodash';
 
+// interfaces
+import Country from '@/interfaces/Country';
+
 export default {
     name: 'CountryView',
     components: { Button },
@@ -21,20 +24,23 @@ export default {
         }
     },
     methods: {
+        // получение данных страны
         async getCountryData() {
             this.loader = true;
             try {
-                const countryData = await CountriesApi.getCountry({ name: this.countryName });
-                this.country = countryData.data[0];
+                const countryData = await CountriesApi.getCountries({ name: this.countryName });
+                this.country = new Country(countryData.data[0]);
                 delay(() => this.loader = false, 300);
             } catch (error) {
                 this.loadDataMessage = 'Произошла ошибка, попробуйте позднее'
                 delay(() => this.loader = false, 300);
             }
         },
+        // получение первогоо слово страны для кнопок, по макету
         getFirstNameBordersCountry(allName) {
             return allName.split(' ')[0];
         },
+        // возвращение к предыдущей стране или на страницу домой
         goToHome() {
             if (!this.historyCountryView) {
                 this.$router.push('/');
@@ -47,6 +53,7 @@ export default {
                 return;
             }
         },
+        // переход по маршруту выбранной страны
         goToCountry(nameCountry) {
             this.historyCountryView++;
 
@@ -54,17 +61,23 @@ export default {
         }
     },
     computed: {
+        // отображение списка когда отключился лоадер и нет ошибки
         isLoadDataMessage() {
-            return this.loader || this.loadDataMessage ? false : true;
+            return !this.loader && !this.loadDataMessage ? false : true;
+        },
+        screenMobile() {
+            return document.body.offsetWidth < 1440;
         }
     },
     watch: {
+        // вотч на изменение маршрута, подтягиваем данные нужной страны
         async '$route.params.name'(value) {
             this.countryName = value;
 
             await this.getCountryData();
         }
     },
+    // хук ж.ц.
     async created() {
         await this.getCountryData();
     }
@@ -73,8 +86,8 @@ export default {
 
 <template>
     <div class="country">
-        <Button class="country__button" @click="goToHome" :img="true" text="Back" />
-        <div v-if="isLoadDataMessage" class="country__content">
+        <div v-if="!isLoadDataMessage && screenMobile" class="country__content">
+            <Button class="country__button" @click="goToHome" :img="true" text="Back" />
             <div class="country__flag-wrapper">
                 <img :src="country.flags.png" alt="flag" class="country__flag">
             </div>
@@ -117,6 +130,63 @@ export default {
             <div class="country__border-button-wrapper">
                 <Button v-for="item in country.bordersCountriesName" class="country__button country__border-button"
                     @click="goToCountry(item.split(' ')[0])" :text="getFirstNameBordersCountry(item)" />
+            </div>
+        </div>
+        <div v-if="!isLoadDataMessage && !screenMobile" class="country__content_desktop">
+            <Button class="country__button" @click="goToHome" :img="true" text="Back" />
+            <div class="country__flag-wrapper">
+                <img :src="country.flags.png" alt="flag" class="country__flag">
+            </div>
+            <div class="country__description-wrapper">
+                <h1 class="country__title">{{ country.name }}</h1>
+                <div class="country__description">
+                    <div class="country__description_first">
+                        <div class="country__nativeName">
+                            <span class="country__type">Native Name: </span>{{ country.nativeName }}
+                        </div>
+                        <div class="country__population">
+                            <span class="country__type">Population: </span>{{ country.population }}
+                        </div>
+                        <div class="country__region">
+                            <span class="country__type">Region: </span>{{ country.region }}
+                        </div>
+                        <div class="country__subregion">
+                            <span class="country__type">Sub Region: </span>{{ country.subregion }}
+                        </div>
+                        <div class="country__capital">
+                            <span class="country__type">Capital: </span>{{ country.capital }}
+                        </div>
+                    </div>
+                    <div class="country__description_first">
+                        <div class="country__domain">
+                            <span class="country__type">Top Level Domain: </span>
+                            <span v-for="(item, index) in country.topLevelDomain" :key="item"
+                                class="country__type country__type_other">{{
+                                    item }}{{
+                                    index !== country.topLevelDomain.length - 1 ? ', ' : '' }}</span>
+                        </div>
+                        <div class="country__currencies">
+                            <span class="country__type">Currencies: </span>
+                            <span v-for="(item, index) in country.currencies" :key="item"
+                                class="country__type country__type_other">{{ item.code }}{{
+                                    index !== country.languages.length - 1 ? ', ' : '' }}</span>
+                        </div>
+                        <div class="country__languages">
+                            <span class="country__type">Languages: </span>
+                            <span v-for="(item, index) in country.languages" :key="item"
+                                class="country__type country__type_other">{{ item.name }}{{
+                                    index !== country.languages.length - 1 ? ', ' : '' }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="country__button-wrapper">
+                    <p class="country__border">Border Countries:</p>
+                    <div class="country__border-button-wrapper">
+                        <Button v-for="item in country.bordersCountriesName"
+                            class="country__button country__border-button" @click="goToCountry(item.split(' ')[0])"
+                            :text="getFirstNameBordersCountry(item)" />
+                    </div>
+                </div>
             </div>
         </div>
         <span v-if="loader" class="home__loader"></span>
@@ -303,6 +373,15 @@ export default {
             }
         }
     }
+
+    &__content {
+        &_desktop {
+            display: grid;
+            grid-template-rows: min-content;
+            grid-template-columns: 560px 598px;
+            grid-column-gap: 120px;
+        }
+    }
 }
 
 @keyframes rotation {
@@ -318,6 +397,113 @@ export default {
 @keyframes animloader {
     50% {
         transform: scale(1) translate(-50%, -50%);
+    }
+}
+
+@media (min-width: 1440px) {
+    .country {
+        padding: 34px 82px 0;
+
+        &__title {
+            font-size: 32px;
+            margin-bottom: 23px;
+        }
+
+        &__type {
+            font-size: 16px;
+        }
+
+        &__nativeName {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        &__population {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        &__region {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        &__subregion {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        &__capital {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+        &__domain {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        &__currencies {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        &__languages {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+        &__button {
+            margin-bottom: 82px;
+            grid-area: 1 / 1 / 2 / 2;
+
+            &-wrapper {
+                display: flex;
+            }
+        }
+
+        &__description {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 68px;
+
+            &-wrapper {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                grid-area: 2/2/3/3;
+            }
+        }
+
+        &__border {
+            display: inline;
+            min-width: 145px;
+            margin-bottom: 0;
+
+            &-button {
+                margin-right: 0;
+                margin-bottom: 0;
+
+                &-wrapper {
+                    display: flex;
+                    flex-wrap: wrap;
+                    margin-bottom: 0;
+                    grid-row-gap: 10px;
+                }
+            }
+        }
+
+        &__flag {
+            width: 560px;
+            height: 401px;
+
+            &-wrapper {
+                width: 560px;
+                height: 401px;
+                grid-area: 2/1/3/2;
+                margin-bottom: 0;
+            }
+        }
     }
 }
 </style>

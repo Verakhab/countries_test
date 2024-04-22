@@ -49,6 +49,7 @@ export default {
         font-family: 'Nunito Sans';
         font-size: 14px;
         font-weight: 300;
+        color: black;
 
         &__img {
             margin-right: 8px;

@@ -46,6 +46,7 @@ export default {
         grid-gap: 75px;
         justify-content: center;
         padding: 0;
+        margin-bottom: 75px;
     }
 }
 </style>

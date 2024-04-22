@@ -1,4 +1,4 @@
-export default class City {
+export default class Country {
     constructor(data) {
         this.name = data.name;
         this.topLevelDomain = data.topLevelDomain;

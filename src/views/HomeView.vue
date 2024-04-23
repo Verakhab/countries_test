@@ -37,15 +37,21 @@ export default {
         },
         // получение стран(ы) с дебаунсом в 700мс
         async getCountry() {
+            this.loadDataMessage = '';
             this.loader = true;
             try {
                 const countryData = await CountriesApi.getCountries({ name: this.searchQuery.toLowerCase() });
-                this.countriesListData = countryData.data.map(country => {
-                    return new Country(country);
-                });
+                if (!countryData.data.length) {
+                    delay(() => this.loadDataMessage = 'Ничего не найдено', 300);
+                } else
+                    this.countriesListData = countryData.data.map(country => {
+                        return new Country(country);
+                    });
+
                 delay(() => this.loader = false, 300);
             } catch (error) {
-                this.loadDataMessage = 'Произошла ошибка, попробуйте позднее'
+                this.loadDataMessage = 'Произошла ошибка, попробуйте позднее';
+
                 delay(() => this.loader = false, 300);
             }
         },
@@ -55,7 +61,7 @@ export default {
                 const countriesData = await CountriesApi.getCountries();
                 this.countriesListData = countriesData.data.map(country => {
                     return new Country(country);
-                });;
+                });
                 delay(() => this.loader = false, 300);
             } catch (error) {
                 this.loadDataMessage = 'Произошла ошибка, попробуйте позднее'
@@ -99,6 +105,7 @@ export default {
         color: #000000;
         font-size: 14px;
         text-align: center;
+        margin-top: 150px;
     }
 
     &__loader {

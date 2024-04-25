@@ -44,6 +44,7 @@ export default {
         grid-template-columns: repeat(4, 264px);
         grid-template-rows: min-content;
         grid-gap: 75px;
+        align-items: flex-start;
         justify-content: center;
         padding: 0;
         margin-bottom: 75px;

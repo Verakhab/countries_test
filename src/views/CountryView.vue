@@ -57,7 +57,7 @@ export default {
         goToCountry(nameCountry) {
             this.historyCountryView++;
 
-            this.$router.push(nameCountry.toLowerCase());
+            this.$router.push(nameCountry.toLowerCase().split(' ').join('-'));
         }
     },
     computed: {
@@ -130,7 +130,7 @@ export default {
             <p class="country__border">Border Countries:</p>
             <div class="country__border-button-wrapper">
                 <Button v-for="item in country.bordersCountriesName" class="country__button country__border-button"
-                    @click="goToCountry(item.split(' ')[0])" :text="getFirstNameBordersCountry(item)" />
+                    @click="goToCountry(item)" :text="item.split(' ')[0]" />
             </div>
         </div>
         <div v-if="!isLoadDataMessage && !screenMobile" class="country__content_desktop">
@@ -184,7 +184,7 @@ export default {
                     <p class="country__border">Border Countries:</p>
                     <div class="country__border-button-wrapper">
                         <Button v-for="item in country.bordersCountriesName"
-                            class="country__button country__border-button" @click="goToCountry(item.split(' ')[0])"
+                            class="country__button country__border-button" @click="goToCountry(item)"
                             :text="getFirstNameBordersCountry(item)" />
                     </div>
                 </div>

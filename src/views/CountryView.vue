@@ -57,7 +57,7 @@ export default {
         goToCountry(nameCountry) {
             this.historyCountryView++;
 
-            this.$router.push(nameCountry.toLowerCase().split(' ').join('-'));
+            this.$router.push(nameCountry.replace(/[\\(\\)]/g, '').toLowerCase().split(' ').join('-'));
         }
     },
     computed: {

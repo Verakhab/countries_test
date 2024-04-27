@@ -27,12 +27,15 @@ export default {
         // получение данных страны
         async getCountryData() {
             this.loader = true;
+
             try {
                 const countryData = await CountriesApi.getCountries({ name: this.countryName });
                 this.country = new Country(countryData.data[0]);
+
                 delay(() => this.loader = false, 300);
             } catch (error) {
-                this.loadDataMessage = 'Произошла ошибка, попробуйте позднее'
+                this.loadDataMessage = 'Произошла ошибка, попробуйте позднее';
+
                 delay(() => this.loader = false, 300);
             }
         },
@@ -44,20 +47,25 @@ export default {
         goToHome() {
             if (!this.historyCountryView) {
                 this.$router.push('/');
-
-                return;
             } else {
                 this.historyCountryView--;
                 this.$router.go(-1);
-
-                return;
             }
         },
         // переход по маршруту выбранной страны
         goToCountry(nameCountry) {
             this.historyCountryView++;
+            let routeName = '';
 
-            this.$router.push(nameCountry.replace(/[\\(\\)]/g, '').toLowerCase().split(' ').join('-'));
+            if (nameCountry.includes('(')) {
+                routeName = nameCountry.replace(/[\\(\\)]/g, '');
+            }
+
+            routeName ?
+                routeName = routeName.toLowerCase().split(' ').join('-') :
+                routeName = nameCountry.toLowerCase().split(' ').join('-');
+
+            this.$router.push(routeName);
         }
     },
     computed: {
@@ -65,6 +73,7 @@ export default {
         isLoadDataMessage() {
             return !this.loader && !this.loadDataMessage ? false : true;
         },
+        // отображение разметки мобильной версии
         screenMobile() {
             return document.body.offsetWidth < 1440;
         }
@@ -130,7 +139,7 @@ export default {
             <p class="country__border">Border Countries:</p>
             <div class="country__border-button-wrapper">
                 <Button v-for="item in country.bordersCountriesName" class="country__button country__border-button"
-                    @click="goToCountry(item)" :text="item.split(' ')[0]" />
+                    @click="goToCountry(item)" :text="getFirstNameBordersCountry(item)" />
             </div>
         </div>
         <div v-if="!isLoadDataMessage && !screenMobile" class="country__content_desktop">
@@ -376,6 +385,8 @@ export default {
     }
 
     &__content {
+        max-width: 320px;
+
         &_desktop {
             display: grid;
             grid-template-rows: min-content;

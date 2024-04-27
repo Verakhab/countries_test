@@ -28,10 +28,6 @@ export default {
         <div class="input__wrapper">
             <input class="input__input" :class="{ 'input__input_disabled': disabled }" :placeholder="placeholder"
                 :value="modelValue" @input="changeData" ref="input" :disabled="disabled" />
-            <div class="input__icon-field" :class="{
-                'input__icon-field_disabled': disabled,
-            }">
-            </div>
         </div>
     </div>
 </template>
@@ -69,7 +65,8 @@ export default {
 
         &_disabled {
             opacity: 1;
-            background: #adadad;
+            border-radius: 5px;
+            background: no-repeat 32px 16px / 16px 16px url('../../assets/img/search.svg'), #dddddd;
         }
 
         &:focus {

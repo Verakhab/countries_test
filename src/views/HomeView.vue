@@ -39,8 +39,10 @@ export default {
         async getCountry() {
             this.loadDataMessage = '';
             this.loader = true;
+
             try {
                 const countryData = await CountriesApi.getCountries({ name: this.searchQuery.toLowerCase() });
+
                 if (!countryData.data.length) {
                     delay(() => this.loadDataMessage = 'Ничего не найдено', 300);
                 } else
@@ -62,9 +64,11 @@ export default {
                 this.countriesListData = countriesData.data.map(country => {
                     return new Country(country);
                 });
+
                 delay(() => this.loader = false, 300);
             } catch (error) {
                 this.loadDataMessage = 'Произошла ошибка, попробуйте позднее'
+
                 delay(() => this.loader = false, 300);
             }
         }
@@ -87,7 +91,7 @@ export default {
     <div class="home">
         <div class="home__search-wrapper">
             <InputComponent :model-value="searchQuery" @update:model-value="changeValueInput"
-                placeholder="Search for a country…" class="home__search" />
+                placeholder="Search for a country…" :disabled="loader" class="home__search" />
         </div>
         <CountriesList v-if="!isLoadDataMessage" :cardList="countriesListData" />
         <span v-if="loader" class="home__loader"></span>
@@ -188,6 +192,10 @@ export default {
             .input__input {
                 font-size: 14px;
                 background: no-repeat 32px 19px / 18px 18px url('../assets/img/search.svg'), transparent;
+
+                &_disabled {
+                    background: no-repeat 32px 19px / 18px 18px url('../assets/img/search.svg'), #dddddd;
+                }
             }
         }
     }

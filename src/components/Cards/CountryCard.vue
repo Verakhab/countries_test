@@ -9,7 +9,17 @@ export default {
     methods: {
         // переход на страницу страны
         goToCountry() {
-            this.$router.push(this.card.name.replace(/[\\(\\)]/g, '').toLowerCase().split(' ').join('-'));
+            let routeName = '';
+
+            if (this.card.name.includes('(')) {
+                routeName = this.card.name.replace(/[\\(\\)]/g, '');
+            }
+
+            routeName ?
+                routeName = routeName.toLowerCase().split(' ').join('-') :
+                routeName = this.card.name.toLowerCase().split(' ').join('-');
+
+            this.$router.push(routeName);
         }
     },
     props: {
